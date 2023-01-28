@@ -1,0 +1,25 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  TF_ROOT: "./gha-image/"
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build & Push Image
+      run: |
+        echo "${{ secrets.DOCKERPW }}" | docker login -u "${{ secrets.DOCKERUSERNAME }}" --password-stdin
+        docker image build -t "${{ secrets.DOCKERUSERNAME }}"/gha-image:v1 .
+        docker push "${{ secrets.DOCKERUSERNAME }}"/gha-image:v1
+      working-directory: "${{ env.TF_ROOT }}"
